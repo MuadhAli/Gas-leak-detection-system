@@ -1,0 +1,345 @@
+<html>
+
+<head>
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link rel="stylesheet" as="style" onload="this.rel='stylesheet'"
+        href="https://fonts.googleapis.com/css2?display=swap&amp;family=Inter%3Awght%40400%3B500%3B700%3B900&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900" />
+
+    <title>Stitch Design</title>
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</head>
+
+<body>
+    <div class="relative flex size-full min-h-screen flex-col bg-[#111418] dark group/design-root overflow-x-hidden"
+        style='font-family: Inter, "Noto Sans", sans-serif;'>
+        <div class="layout-container flex h-full grow flex-col">
+            <header
+                class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#293038] px-10 py-3">
+                <div class="flex items-center gap-4 text-white">
+                    <div class="size-4">
+                        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 6H42L36 24L42 42H6L12 24L6 6Z" fill="currentColor"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">SensorView</h2>
+                </div>
+                <div class="flex flex-1 justify-end gap-8">
+                    <div class="flex items-center gap-9">
+                        <a class="text-white text-sm font-medium leading-normal" href="#">Overview</a>
+                        <a class="text-white text-sm font-medium leading-normal" href="#">Reports</a>
+                        <a class="text-white text-sm font-medium leading-normal" href="#">Settings</a>
+                    </div>
+                    <button
+                        class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#293038] text-white gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
+                        <div class="text-white" data-icon="Bell" data-size="20px" data-weight="regular">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor"
+                                viewBox="0 0 256 256">
+                                <path
+                                    d="M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.05,8.28,66.73,16,80Z">
+                                </path>
+                            </svg>
+                        </div>
+                    </button>
+                    <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
+                        style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAksRM7PQa9yvIIbwOYEsk5eNtzK0uy5GMSwhKhSGsPCGWrt8zj_y1YuPgC2YbaHcO2v6jmW_0HO4ju9zJQhs5oC4tBBGQmnoWy4_wdljnYGH8iErJ2p528ocy1AehunbWUIizJHafIXqxrb4sLOkQR5yjJEf2OpINmBdIAiXCgXRtIDk58JNCsMbotsuuhWdAoiC9wTcgvJguEbP4S-VVq98d2UjElYEg8klLaiQ4bwL_Md0fpCOxjbAAL10FG4EaaljcwIQmIFQ");'>
+                    </div>
+                </div>
+            </header>
+            <div class="px-40 flex flex-1 justify-center py-5">
+                <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+                    <div class="flex flex-wrap justify-between gap-3 p-4">
+                        <p class="text-white tracking-light text-[32px] font-bold leading-tight min-w-72">Industrial
+                            Monitoring Dashboard</p>
+                    </div>
+                    
+                    <!-- Sensor Data Section -->
+                    <div class="flex flex-wrap gap-4 p-4">
+                        <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-[#293038]">
+                            <p class="text-white text-base font-medium leading-normal">Temperature</p>
+                            <p id="temperature" class="text-white tracking-light text-2xl font-bold leading-tight">--
+                            </p>
+                        </div>
+                        <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-[#293038]">
+                            <p class="text-white text-base font-medium leading-normal">Humidity</p>
+                            <p id="humidity" class="text-white tracking-light text-2xl font-bold leading-tight">--</p>
+                        </div>
+                        <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-[#293038]">
+                            <p class="text-white text-base font-medium leading-normal">Fire Detection</p>
+                            <p id="flame" class="text-white tracking-light text-2xl font-bold leading-tight">--</p>
+                        </div>
+                        <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-[#293038]">
+                            <p class="text-white text-base font-medium leading-normal">Gas Leak</p>
+                            <p id="gas" class="text-white tracking-light text-2xl font-bold leading-tight">--</p>
+                        </div>
+                    </div>
+
+
+                    
+                    <div class="flex flex-wrap gap-4 px-4 py-6">
+                        <div class="flex min-w-72 flex-1 flex-col gap-2 rounded-lg border border-[#3c4753] p-6">
+                            <p class="text-white text-base font-medium leading-normal">Outside Temperature (Weather)</p>
+                            <p id="outsideTemp" class="text-white tracking-light text-[32px] font-bold leading-tight truncate">--</p>
+                            <div class="flex gap-1">
+                                <p class="text-[#9daab8] text-base font-normal leading-normal">Last 24 Hours</p>
+                                <p id="tempTrend" class="text-[#0bda5e] text-base font-medium leading-normal">--</p>
+                            </div>
+                            <div class="flex min-h-[180px] flex-1 flex-col gap-8 py-4">
+                                <canvas id="temperatureChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                        <div class="flex min-w-72 flex-1 flex-col gap-2 rounded-lg border border-[#3c4753] p-6">
+                            <p class="text-white text-base font-medium leading-normal">Outside Humidity (Weather)</p>
+                            <p id="outsideHumidity" class="text-white tracking-light text-[32px] font-bold leading-tight truncate">--</p>
+                            <div class="flex gap-1">
+                                <p class="text-[#9daab8] text-base font-normal leading-normal">Last 24 Hours</p>
+                                <p id="humidityTrend" class="text-[#0bda5e] text-base font-medium leading-normal">--</p>
+                            </div>
+                            <div class="flex min-h-[180px] flex-1 flex-col gap-8 py-4">
+                                <canvas id="humidityChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Weather data storage
+        let weatherHistory = {
+            temperature: [],
+            humidity: [],
+            timestamps: []
+        };
+
+        // Chart instances
+        let temperatureChart;
+        let humidityChart;
+
+        // Initialize charts
+        function initCharts() {
+            const chartConfig = {
+                type: 'line',
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            grid: {
+                                color: '#3c4753'
+                            },
+                            ticks: {
+                                color: '#9daab8',
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        },
+                        y: {
+                            display: true,
+                            grid: {
+                                color: '#3c4753'
+                            },
+                            ticks: {
+                                color: '#9daab8',
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        }
+                    },
+                    elements: {
+                        point: {
+                            radius: 2,
+                            hoverRadius: 4
+                        }
+                    }
+                }
+            };
+
+            // Temperature Chart
+            const tempCtx = document.getElementById('temperatureChart').getContext('2d');
+            temperatureChart = new Chart(tempCtx, {
+                ...chartConfig,
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Temperature',
+                        data: [],
+                        borderColor: '#0bda5e',
+                        backgroundColor: 'rgba(11, 218, 94, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                }
+            });
+
+            // Humidity Chart
+            const humidityCtx = document.getElementById('humidityChart').getContext('2d');
+            humidityChart = new Chart(humidityCtx, {
+                ...chartConfig,
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Humidity',
+                        data: [],
+                        borderColor: '#60a5fa',
+                        backgroundColor: 'rgba(96, 165, 250, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                }
+            });
+        }
+
+        // Add data to charts
+        function updateCharts(temperature, humidity) {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+
+            // Add new data
+            weatherHistory.temperature.push(temperature);
+            weatherHistory.humidity.push(humidity);
+            weatherHistory.timestamps.push(timeString);
+
+            // Keep only last 20 data points
+            if (weatherHistory.temperature.length > 20) {
+                weatherHistory.temperature.shift();
+                weatherHistory.humidity.shift();
+                weatherHistory.timestamps.shift();
+            }
+
+            // Update temperature chart
+            temperatureChart.data.labels = [...weatherHistory.timestamps];
+            temperatureChart.data.datasets[0].data = [...weatherHistory.temperature];
+            temperatureChart.update('none');
+
+            // Update humidity chart
+            humidityChart.data.labels = [...weatherHistory.timestamps];
+            humidityChart.data.datasets[0].data = [...weatherHistory.humidity];
+            humidityChart.update('none');
+
+            // Calculate trends
+            updateTrends();
+        }
+
+        // Calculate and display trends
+        function updateTrends() {
+            if (weatherHistory.temperature.length >= 2) {
+                const tempFirst = weatherHistory.temperature[0];
+                const tempLast = weatherHistory.temperature[weatherHistory.temperature.length - 1];
+                const tempChange = ((tempLast - tempFirst) / tempFirst * 100).toFixed(1);
+                
+                const humFirst = weatherHistory.humidity[0];
+                const humLast = weatherHistory.humidity[weatherHistory.humidity.length - 1];
+                const humChange = ((humLast - humFirst) / humFirst * 100).toFixed(1);
+
+                document.getElementById('tempTrend').textContent = `${tempChange > 0 ? '+' : ''}${tempChange}%`;
+                document.getElementById('tempTrend').className = `text-base font-medium leading-normal ${tempChange >= 0 ? 'text-[#0bda5e]' : 'text-[#fa6238]'}`;
+                
+                document.getElementById('humidityTrend').textContent = `${humChange > 0 ? '+' : ''}${humChange}%`;
+                document.getElementById('humidityTrend').className = `text-base font-medium leading-normal ${humChange >= 0 ? 'text-[#0bda5e]' : 'text-[#fa6238]'}`;
+            }
+        }
+
+        // Function to fetch weather data from a free weather API
+        async function fetchWeather() {
+            try {
+                // Using wttr.in for Mangalore, Karnataka, India
+                const response = await fetch('https://wttr.in/Mangalore,Karnataka,India?format=j1');
+                
+                if (!response.ok) throw new Error("Weather API response was not ok");
+                
+                const data = await response.json();
+                
+                return {
+                    temperature: Math.round(data.current_condition[0].temp_C),
+                    humidity: data.current_condition[0].humidity,
+                    description: data.current_condition[0].weatherDesc[0].value,
+                    location: data.nearest_area[0].areaName[0].value + ", " + data.nearest_area[0].country[0].value
+                };
+            } catch (error) {
+                console.error("Weather fetch error:", error);
+                return {
+                    temperature: "N/A",
+                    humidity: "N/A",
+                    description: "Unable to fetch",
+                    location: "Unknown"
+                };
+            }
+        }
+
+        async function updateAllData() {
+            // Fetch weather data
+            const weather = await fetchWeather();
+            if (weather.temperature !== "N/A" && weather.humidity !== "N/A") {
+                document.getElementById("outsideTemp").textContent = weather.temperature + "°C";
+                document.getElementById("outsideHumidity").textContent = weather.humidity + "%";
+                
+                // Update charts with new weather data
+                updateCharts(parseInt(weather.temperature), parseInt(weather.humidity));
+            }
+        }
+
+        // Update both sensor and weather data every 5 seconds
+// Call sensor data every 1 second
+setInterval(async () => {
+    try {
+        const response = await fetch("http://192.168.1.12/sensor");
+        if (!response.ok) throw new Error("Network response was not ok");
+
+        const data = await response.json();
+
+        document.getElementById("temperature").textContent = data.temperature + "°C";
+        document.getElementById("humidity").textContent = data.humidity + "%";
+
+        // Fix: explicit string check
+        if (data.flame === "Flame Detected") {
+            document.getElementById("flame").textContent = "🔥 Fire Detected";
+        } else {
+            document.getElementById("flame").textContent = "✅ No Fire";
+        }
+
+        document.getElementById("gas").textContent = data.gas ? "⚠️ Gas Leak" : "✅ No Leak";
+    } catch (error) {
+        console.error("Sensor fetch error:", error);
+    }
+}, 1000);
+
+
+// Call weather API every 2 minutes
+setInterval(async () => {
+    const weather = await fetchWeather();
+    if (weather.temperature !== "N/A" && weather.humidity !== "N/A") {
+        document.getElementById("outsideTemp").textContent = weather.temperature + "°C";
+        document.getElementById("outsideHumidity").textContent = weather.humidity + "%";
+
+        // Update charts with new weather data
+        updateCharts(parseInt(weather.temperature), parseInt(weather.humidity));
+    }
+}, 120000); // every 2 minutes
+        
+        // Initial load
+        window.onload = function() {
+            initCharts();
+            updateAllData();
+        };
+    </script>
+
+</body>
+
+</html>
