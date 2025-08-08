@@ -1,79 +1,58 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
-#include <DHT.h>
 
-// WiFi credentials
+// === WiFi credentials ===
 const char* ssid = "Airtel_Zerotouch";
 const char* password = "Airtel@123";
 
-// Sensor pins
-#define DHTPIN D5                // GPIO14
-#define DHTTYPE DHT11
-#define FLAME_SENSOR_PIN D2      // GPIO4
-#define BUZZER_PIN D1            // GPIO5
+// === Pin Definitions ===
+#define FLAME_SENSOR_PIN D6        // GPIO12
+#define MQ135_SENSOR_PIN A0
 
-DHT dht(DHTPIN, DHTTYPE);
-ESP8266WebServer server(80);     // Web server on port 80
+ESP8266WebServer server(80);       // Web server on port 80
 
 void setup() {
   Serial.begin(115200);
-
-  // Setup pins
   pinMode(FLAME_SENSOR_PIN, INPUT);
-  pinMode(BUZZER_PIN, OUTPUT);
-  digitalWrite(BUZZER_PIN, LOW); // Buzzer OFF
 
-  // Start DHT
-  dht.begin();
-
-  // Connect to WiFi
-  Serial.println("Connecting to WiFi...");
+  // === Connect to Wi-Fi ===
   WiFi.begin(ssid, password);
-
+  Serial.print("🔌 Connecting to WiFi");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
+  Serial.println("\n✅ Connected! IP Address: " + WiFi.localIP().toString());
 
-  Serial.println("");
-  Serial.print("✅ WiFi connected. IP Address: ");
-  Serial.println(WiFi.localIP());
-
-  // Set up HTTP endpoints
+  // === Route: /sensor ===
   server.on("/sensor", HTTP_GET, []() {
-    float humidity = dht.readHumidity();
-    float temperature = dht.readTemperature();
-    int flameState = digitalRead(FLAME_SENSOR_PIN);
-    String flameStatus = (flameState == LOW) ? "Flame Detected" : "No Flame";
+    int flameValue = digitalRead(FLAME_SENSOR_PIN);     // 0 = fire, 1 = no fire
+    int mq135Value = analogRead(MQ135_SENSOR_PIN);      // 0-1023
 
+    String flameStatus = (flameValue == 0) ? "Fire Detected" : "No Fire";
+    String airQuality = "Good";
+
+    if (mq135Value > 750) airQuality = "Poor (High Carbon Detected)";
+    else if (mq135Value >= 650) airQuality = "Moderate";
+
+    // === Create JSON string manually ===
     String json = "{";
-    if (isnan(temperature) || isnan(humidity)) {
-      json += "\"error\": \"Failed to read from DHT11\"";
-    } else {
-      json += "\"temperature\": " + String(temperature, 1);
-      json += ", \"humidity\": " + String(humidity, 1);
-    }
-    json += ", \"flame\": \"" + flameStatus + "\"";
+    json += "\"flame\": \"" + flameStatus + "\",";
+    json += "\"mq135_value\": " + String(mq135Value) + ",";
+    json += "\"air_quality\": \"" + airQuality + "\"";
     json += "}";
 
-    server.sendHeader("Access-Control-Allow-Origin", "*");  // CORS
+    // === Send response with CORS ===
+    server.sendHeader("Access-Control-Allow-Origin", "*");
     server.send(200, "application/json", json);
-  });
 
-  server.on("/buzzon", HTTP_GET, []() {
-    digitalWrite(BUZZER_PIN, HIGH);
-    server.sendHeader("Access-Control-Allow-Origin", "*");
-    server.send(200, "text/plain", "🔔 Buzzer ON");
-  });
-
-  server.on("/buzzoff", HTTP_GET, []() {
-    digitalWrite(BUZZER_PIN, LOW);
-    server.sendHeader("Access-Control-Allow-Origin", "*");
-    server.send(200, "text/plain", "🔕 Buzzer OFF");
+    // === Debug output ===
+    Serial.printf("[Sensor] Flame: %s, MQ135: %d, Air: %s\n", 
+                  flameStatus.c_str(), mq135Value, airQuality.c_str());
   });
 
   server.begin();
-  Serial.println("🌐 Web server started");
+  Serial.println("🌐 Web server started. Access at: http://" + WiFi.localIP().toString() + "/sensor");
 }
 
 void loop() {

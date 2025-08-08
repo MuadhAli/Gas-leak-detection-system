@@ -1,0 +1,66 @@
+#include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
+#include <ArduinoJson.h>
+
+// WiFi credentials
+const char* ssid = "YOUR_WIFI_SSID";
+const char* password = "YOUR_WIFI_PASSWORD";
+
+// Server endpoint
+const char* serverUrl = "http://your-server-endpoint.com/data";  // Replace with your endpoint
+
+// Pin definitions
+#define FLAME_SENSOR_PIN D6
+#define MQ135_SENSOR_PIN A0
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(FLAME_SENSOR_PIN, INPUT);
+
+  // Connect to Wi-Fi
+  WiFi.begin(ssid, password);
+  Serial.print("Connecting to WiFi");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nConnected to WiFi.");
+}
+
+void loop() {
+  // Read sensor values
+  int flameDetected = digitalRead(FLAME_SENSOR_PIN); // 0 = fire, 1 = no fire
+  int mq135Value = analogRead(MQ135_SENSOR_PIN);     // 0-1023
+
+  // Interpret air quality
+  String airQuality = "Good";
+  if (mq135Value > 300 && mq135Value < 700) airQuality = "Moderate";
+  else if (mq135Value >= 700) airQuality = "Poor (High Carbon Detected)";
+
+  // Create JSON payload
+  StaticJsonDocument<200> doc;
+  doc["flame"] = (flameDetected == 0) ? "Fire Detected" : "No Fire";
+  doc["mq135_value"] = mq135Value;
+  doc["air_quality"] = airQuality;
+
+  String jsonPayload;
+  serializeJson(doc, jsonPayload);
+
+  // Send HTTP POST
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+    http.begin(serverUrl);
+    http.addHeader("Content-Type", "application/json");
+
+    int httpResponseCode = http.POST(jsonPayload);
+
+    Serial.print("HTTP Response code: ");
+    Serial.println(httpResponseCode);
+    http.end();
+  } else {
+    Serial.println("WiFi Disconnected");
+  }
+
+  // Wait before sending next data
+  delay(10000);  // Send data every 10 seconds
+}
