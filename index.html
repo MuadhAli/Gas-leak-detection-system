@@ -307,7 +307,7 @@
         setInterval(async () => {
             try {
                 // Fetch temperature, humidity, gas from 192.168.1.17
-                const response1 = await fetch("http://192.168.1.17/sensor");
+                const response1 = await fetch("https://vzrbxh0b-5000.inc1.devtunnels.ms/api/sensor1");
                 if (!response1.ok) throw new Error("Network response was not ok (192.168.1.17)");
 
                 const data1 = await response1.json();
@@ -317,21 +317,18 @@
                 document.getElementById("gas").textContent = data1.gas_detected ? "⚠️ Gas Leak" : "✅ No Leak";
 
                 // Fetch flame and air quality from 192.168.1.12
-                const response2 = await fetch("http://192.168.1.12/sensor");
-fetch('http://192.168.1.50/sensor')
-  .then(res => res.json())
-  .then(data => console.log(data))
-  .catch(err => console.error("FETCH ERROR:", err));
+                const response2 = await fetch("https://vzrbxh0b-5000.inc1.devtunnels.ms/api/sensor2");
+                
                 if (!response2.ok) throw new Error("Network response was not ok (192.168.1.12)");
 
                 const data2 = await response2.json();
 
                 // Flame detection logic
-if (data2.flame === "No Fire") {
-    document.getElementById("flame").textContent = "✅ No Fire";
-} else {
-    document.getElementById("flame").textContent = "🔥 Fire Detected";
-}
+                if (data2.flame === "No Fire") {
+                    document.getElementById("flame").textContent = "✅ No Fire";
+                } else {
+                    document.getElementById("flame").textContent = "🔥 Fire Detected";
+                }
 
                 // Air Quality logic
                 const mqValue = data2.mq135_value;
