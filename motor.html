@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Valve Control - Sensor 2</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1d2671, #c33764);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #fff;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      text-align: center;
+      width: 350px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 25px;
+      margin: 10px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    .btn-on {
+      background: #28a745;
+      color: white;
+    }
+
+    .btn-off {
+      background: #dc3545;
+      color: white;
+    }
+
+    .btn:hover {
+      opacity: 0.8;
+      transform: translateY(-2px);
+    }
+
+    .status {
+      margin-top: 20px;
+      font-size: 16px;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Valve Control</h1>
+    <button class="btn btn-on" onclick="controlBuzzer('on')">Turn ON</button>
+    <button class="btn btn-off" onclick="controlBuzzer('off')">Turn OFF</button>
+    <div class="status" id="status">Status: Idle</div>
+  </div>
+
+  <script>
+    function controlBuzzer(action) {
+      let url = "";
+      if (action === "on") {
+        url = "http://192.168.1.2:5000/api/sensor2/buzzon";
+      } else if (action === "off") {
+        url = "http://192.168.1.2:5000/api/sensor2/buzzoff";
+      }
+
+      fetch(url)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Request failed");
+          }
+          return response.text();
+        })
+        .then(data => {
+          document.getElementById("status").innerText = "Status: Valve " + (action === "on" ? "ON ✅" : "OFF ❌");
+        })
+        .catch(error => {
+          document.getElementById("status").innerText = "Error: " + error;
+        });
+    }
+  </script>
+</body>
+</html>

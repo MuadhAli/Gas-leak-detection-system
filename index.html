@@ -5,7 +5,7 @@
     <link rel="stylesheet" as="style" onload="this.rel='stylesheet'"
         href="https://fonts.googleapis.com/css2?display=swap&amp;family=Inter%3Awght%40400%3B500%3B700%3B900&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900" />
 
-    <title>Stitch Design</title>
+    <title>Dashboard</title>
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -28,7 +28,7 @@
                 </div>
                 <div class="flex flex-1 justify-end gap-8">
                     <div class="flex items-center gap-9">
-                        <a class="text-white text-sm font-medium leading-normal" href="#">Overview</a>
+                        <a class="text-white text-sm font-medium leading-normal" href="./motor.html">Overview</a>
                         <a class="text-white text-sm font-medium leading-normal" href="#">Reports</a>
                         <a class="text-white text-sm font-medium leading-normal" href="#">Settings</a>
                     </div>
@@ -113,6 +113,7 @@
             </div>
         </div>
     </div>
+    
     <script>
         // Weather data storage
         let weatherHistory = {
@@ -307,6 +308,7 @@
         setInterval(async () => {
             try {
                 // Fetch temperature, humidity, gas from 192.168.1.17
+                // const response1 = await fetch("http://192.168.1.2:5000/api/sensor1");
                 const response1 = await fetch("https://vzrbxh0b-5000.inc1.devtunnels.ms/api/sensor1");
                 if (!response1.ok) throw new Error("Network response was not ok (192.168.1.17)");
 
@@ -317,7 +319,9 @@
                 document.getElementById("gas").textContent = data1.gas_detected ? "⚠️ Gas Leak" : "✅ No Leak";
 
                 // Fetch flame and air quality from 192.168.1.12
+                // const response2 = await fetch("http://192.168.1.2:5000/api/sensor2");
                 const response2 = await fetch("https://vzrbxh0b-5000.inc1.devtunnels.ms/api/sensor2");
+
                 
                 if (!response2.ok) throw new Error("Network response was not ok (192.168.1.12)");
 
