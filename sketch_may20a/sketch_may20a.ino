@@ -1,24 +1,36 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
+#include <DHT.h>
 
 // === WiFi credentials ===
-const char* ssid = "Airtel_Zerotouch";
-const char* password = "Airtel@123";
+const char* ssid = "iphone420";
+const char* password = "123456781";
 
 // === Pin Definitions ===
-#define FLAME_SENSOR_PIN D6        // GPIO12
-#define MQ135_SENSOR_PIN A0
-#define BUZZER_PIN D5              // GPIO14 (Change if needed)
+#define DHTPIN D5                // GPIO14
+#define DHTTYPE DHT11
+#define BUZZER_PIN D1            // GPIO5
+#define MQ5_PIN A0               // Analog pin for MQ-5
 
-ESP8266WebServer server(80);       // Web server on port 80
+// === Sensor & Threshold Config ===
+DHT dht(DHTPIN, DHTTYPE);
+const int gasThreshold = 300;    // Adjust based on your calibration
+int currentGasValue = 0;
+bool gasDetected = false;
+
+ESP8266WebServer server(80);     // Web server on port 80
 
 void setup() {
   Serial.begin(115200);
-  pinMode(FLAME_SENSOR_PIN, INPUT);
-  pinMode(BUZZER_PIN, OUTPUT);
-  digitalWrite(BUZZER_PIN, LOW);   // Ensure buzzer is OFF initially
+  delay(1000);
+  Serial.println("\n🚀 Starting ESP8266 with DHT11 and MQ-5");
 
-  // === Connect to Wi-Fi ===
+  // === Pin Modes ===
+  pinMode(BUZZER_PIN, OUTPUT);
+  digitalWrite(BUZZER_PIN, LOW); // Buzzer OFF
+  dht.begin();
+
+  // === WiFi Setup ===
   WiFi.begin(ssid, password);
   Serial.print("🔌 Connecting to WiFi");
   while (WiFi.status() != WL_CONNECTED) {
@@ -27,47 +39,43 @@ void setup() {
   }
   Serial.println("\n✅ Connected! IP Address: " + WiFi.localIP().toString());
 
-  // === Route: /sensor ===
+  // === Route: Sensor Data ===
   server.on("/sensor", HTTP_GET, []() {
-    int flameValue = digitalRead(FLAME_SENSOR_PIN);     // 0 = fire, 1 = no fire
-    int mq135Value = analogRead(MQ135_SENSOR_PIN);      // 0-1023
+    float humidity = dht.readHumidity();
+    float temperature = dht.readTemperature();
+    currentGasValue = analogRead(MQ5_PIN);
+    gasDetected = (currentGasValue > gasThreshold);
 
-    String flameStatus = (flameValue == 0) ? "Fire Detected" : "No Fire";
-    String airQuality = "Good";
-
-    if (mq135Value > 750) airQuality = "Poor (High Carbon Detected)";
-    else if (mq135Value >= 650) airQuality = "Moderate";
-
-    // === Create JSON string manually ===
     String json = "{";
-    json += "\"flame\": \"" + flameStatus + "\",";
-    json += "\"mq135_value\": " + String(mq135Value) + ",";
-    json += "\"air_quality\": \"" + airQuality + "\"";
+    if (isnan(temperature) || isnan(humidity)) {
+      json += "\"error\": \"Failed to read from DHT11\"";
+    } else {
+      json += "\"temperature\": " + String(temperature, 1);
+      json += ", \"humidity\": " + String(humidity, 1);
+    }
+    json += ", \"gas_detected\": " + String(gasDetected ? "true" : "false");
+    json += ", \"gas_value\": " + String(currentGasValue);
     json += "}";
 
-    // === Send response with CORS ===
     server.sendHeader("Access-Control-Allow-Origin", "*");
     server.send(200, "application/json", json);
 
-    // === Debug output ===
-    Serial.printf("[Sensor] Flame: %s, MQ135: %d, Air: %s\n", 
-                  flameStatus.c_str(), mq135Value, airQuality.c_str());
+    Serial.printf("[Sensor] Temp: %.1f, Humidity: %.1f, Gas: %d, Detected: %s\n",
+                  temperature, humidity, currentGasValue, gasDetected ? "YES" : "NO");
   });
 
-  // === Route: /buzzon ===
+  // === Route: Buzzer ON ===
   server.on("/buzzon", HTTP_GET, []() {
     digitalWrite(BUZZER_PIN, HIGH);
     server.sendHeader("Access-Control-Allow-Origin", "*");
-    server.send(200, "application/json", "{\"status\":\"Buzzer ON\"}");
-    Serial.println("🔔 Buzzer ON");
+    server.send(200, "text/plain", "🔔 Buzzer ON");
   });
 
-  // === Route: /buzzoff ===
+  // === Route: Buzzer OFF ===
   server.on("/buzzoff", HTTP_GET, []() {
     digitalWrite(BUZZER_PIN, LOW);
     server.sendHeader("Access-Control-Allow-Origin", "*");
-    server.send(200, "application/json", "{\"status\":\"Buzzer OFF\"}");
-    Serial.println("🔕 Buzzer OFF");
+    server.send(200, "text/plain", "🔕 Buzzer OFF");
   });
 
   server.begin();

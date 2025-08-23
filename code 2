@@ -2,18 +2,21 @@
 #include <ESP8266WebServer.h>
 
 // === WiFi credentials ===
-const char* ssid = "Airtel_Zerotouch";
-const char* password = "Airtel@123";
+const char* ssid = "iphone420";
+const char* password = "123456781";
 
 // === Pin Definitions ===
 #define FLAME_SENSOR_PIN D6        // GPIO12
 #define MQ135_SENSOR_PIN A0
+#define BUZZER_PIN D5              // GPIO14 (Change if needed)
 
 ESP8266WebServer server(80);       // Web server on port 80
 
 void setup() {
   Serial.begin(115200);
   pinMode(FLAME_SENSOR_PIN, INPUT);
+  pinMode(BUZZER_PIN, OUTPUT);
+  digitalWrite(BUZZER_PIN, LOW);   // Ensure buzzer is OFF initially
 
   // === Connect to Wi-Fi ===
   WiFi.begin(ssid, password);
@@ -49,6 +52,22 @@ void setup() {
     // === Debug output ===
     Serial.printf("[Sensor] Flame: %s, MQ135: %d, Air: %s\n", 
                   flameStatus.c_str(), mq135Value, airQuality.c_str());
+  });
+
+  // === Route: /buzzon ===
+  server.on("/buzzon", HTTP_GET, []() {
+    digitalWrite(BUZZER_PIN, HIGH);
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+    server.send(200, "application/json", "{\"status\":\"Buzzer ON\"}");
+    Serial.println("🔔 Buzzer ON");
+  });
+
+  // === Route: /buzzoff ===
+  server.on("/buzzoff", HTTP_GET, []() {
+    digitalWrite(BUZZER_PIN, LOW);
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+    server.send(200, "application/json", "{\"status\":\"Buzzer OFF\"}");
+    Serial.println("🔕 Buzzer OFF");
   });
 
   server.begin();

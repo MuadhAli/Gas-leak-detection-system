@@ -11,7 +11,7 @@ CORS(app)  # Enable CORS for all routes
 @app.route('/api/sensor1')
 def sensor1():
     try:
-        r = requests.get("http://192.168.1.17/sensor", timeout=3)
+        r = requests.get("http://172.20.10.3/sensor", timeout=3)
         return jsonify(r.json())
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -20,7 +20,7 @@ def sensor1():
 @app.route('/api/sensor2')
 def sensor2():
     try:
-        r = requests.get("http://192.168.1.12/sensor", timeout=3)
+        r = requests.get("http://172.20.10.2/sensor", timeout=3)
         return jsonify(r.json())
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -32,7 +32,7 @@ def sensor2():
 @app.route('/api/sensor1/buzzon')
 def sensor1_buzzon():
     try:
-        r = requests.get("http://192.168.1.17/buzzon", timeout=3)
+        r = requests.get("http://172.20.10.3/buzzon", timeout=3)
         return jsonify({"status": "Buzzer ON (sensor1)", "response": r.text})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -41,7 +41,7 @@ def sensor1_buzzon():
 @app.route('/api/sensor1/buzzoff')
 def sensor1_buzzoff():
     try:
-        r = requests.get("http://192.168.1.17/buzzoff", timeout=3)
+        r = requests.get("http://172.20.10.3/buzzoff", timeout=3)
         return jsonify({"status": "Buzzer OFF (sensor1)", "response": r.text})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -50,7 +50,7 @@ def sensor1_buzzoff():
 @app.route('/api/sensor2/buzzon')
 def sensor2_buzzon():
     try:
-        r = requests.get("http://192.168.1.12/buzzon", timeout=3)
+        r = requests.get("http://172.20.10.2/buzzon", timeout=3)
         return jsonify({"status": "Buzzer ON (sensor2)", "response": r.text})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -59,7 +59,7 @@ def sensor2_buzzon():
 @app.route('/api/sensor2/buzzoff')
 def sensor2_buzzoff():
     try:
-        r = requests.get("http://192.168.1.12/buzzoff", timeout=3)
+        r = requests.get("http://172.20.10.2/buzzoff", timeout=3)
         return jsonify({"status": "Buzzer OFF (sensor2)", "response": r.text})
     except Exception as e:
         return jsonify({"error": str(e)}), 500

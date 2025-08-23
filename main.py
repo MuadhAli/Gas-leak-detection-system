@@ -12,8 +12,8 @@ TWILIO_FROM_NUMBER = "+12766638646"
 TO_NUMBER = "+919845119468"
 
 # ==== ESP Sensor Endpoints ====
-FIRE_AIR_URL = "http://192.168.1.12/sensor"  # ESP fire & air
-GAS_URL = "http://192.168.1.17/sensor"       # ESP MQ-5 gas
+FIRE_AIR_URL = "http://172.20.10.2/sensor"  # ESP fire & air
+GAS_URL = "http://172.20.10.3/sensor"       # ESP MQ-5 gas
 
 # ==== Flask API Buzzer Endpoints ====
 BUZZER_SENSOR1_ON = "http://127.0.0.1:5000/api/sensor1/buzzon"
