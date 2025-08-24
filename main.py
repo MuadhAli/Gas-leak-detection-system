@@ -3,23 +3,19 @@ import time
 from twilio.rest import Client
 import os
 from dotenv import load_dotenv
+from constants import (
+    TWILIO_FROM_NUMBER, TO_NUMBER,
+    FIRE_AIR_URL, GAS_URL,
+    BUZZER_SENSOR1_ON, BUZZER_SENSOR1_OFF,
+    BUZZER_SENSOR2_ON, BUZZER_SENSOR2_OFF,
+    SENSOR_REQUEST_TIMEOUT, BUZZER_REQUEST_TIMEOUT,
+    ALERT_WAIT_TIME, MAIN_LOOP_DELAY
+)
 
 # ==== Load Env ====
 load_dotenv()
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
-TWILIO_FROM_NUMBER = "+12766638646"
-TO_NUMBER = "+919845119468"
-
-# ==== ESP Sensor Endpoints ====
-FIRE_AIR_URL = "http://172.20.10.2/sensor"  # ESP fire & air
-GAS_URL = "http://172.20.10.3/sensor"       # ESP MQ-5 gas
-
-# ==== Flask API Buzzer Endpoints ====
-BUZZER_SENSOR1_ON = "http://127.0.0.1:5000/api/sensor1/buzzon"
-BUZZER_SENSOR1_OFF = "http://127.0.0.1:5000/api/sensor1/buzzoff"
-BUZZER_SENSOR2_ON = "http://127.0.0.1:5000/api/sensor2/buzzon"
-BUZZER_SENSOR2_OFF = "http://127.0.0.1:5000/api/sensor2/buzzoff"
 
 # ==== Twilio Client ====
 client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
@@ -36,13 +32,13 @@ def trigger_call(message):
 def activate_buzzers():
     """Turn ON both ESP buzzers through Flask API."""
     try:
-        requests.get(BUZZER_SENSOR1_ON, timeout=3)
+        requests.get(BUZZER_SENSOR1_ON, timeout=BUZZER_REQUEST_TIMEOUT)
         print("🔔 Sensor1 buzzer ON")
     except Exception as e:
         print(f"❌ Failed to activate Sensor1 buzzer: {e}")
 
     try:
-        requests.get(BUZZER_SENSOR2_ON, timeout=3)
+        requests.get(BUZZER_SENSOR2_ON, timeout=BUZZER_REQUEST_TIMEOUT)
         print("🔔 Sensor2 buzzer ON")
     except Exception as e:
         print(f"❌ Failed to activate Sensor2 buzzer: {e}")
@@ -50,13 +46,13 @@ def activate_buzzers():
 def deactivate_buzzers():
     """Turn OFF both ESP buzzers through Flask API."""
     try:
-        requests.get(BUZZER_SENSOR1_OFF, timeout=3)
+        requests.get(BUZZER_SENSOR1_OFF, timeout=BUZZER_REQUEST_TIMEOUT)
         print("🔕 Sensor1 buzzer OFF")
     except Exception as e:
         print(f"❌ Failed to deactivate Sensor1 buzzer: {e}")
 
     try:
-        requests.get(BUZZER_SENSOR2_OFF, timeout=3)
+        requests.get(BUZZER_SENSOR2_OFF, timeout=BUZZER_REQUEST_TIMEOUT)
         print("🔕 Sensor2 buzzer OFF")
     except Exception as e:
         print(f"❌ Failed to deactivate Sensor2 buzzer: {e}")
@@ -67,7 +63,7 @@ print("🚀 Monitoring fire, air quality, and petrol gas...")
 while True:
     try:
         # === Fetch Fire & Air Quality Data ===
-        response_fire = requests.get(FIRE_AIR_URL, timeout=5)
+        response_fire = requests.get(FIRE_AIR_URL, timeout=SENSOR_REQUEST_TIMEOUT)
         response_fire.raise_for_status()
         data_fire = response_fire.json()
 
@@ -80,20 +76,20 @@ while True:
             print("🚨 Fire detected! Activating alarms & calling...")
             activate_buzzers()
             trigger_call("Warning! Fire detected at your premises.")
-            print("⏳ Waiting 60 seconds...")
-            time.sleep(60)
+            print(f"⏳ Waiting {ALERT_WAIT_TIME} seconds...")
+            time.sleep(ALERT_WAIT_TIME)
             deactivate_buzzers()
 
         elif "Poor" in air_quality:
             print("⚠️ Poor air quality detected! Activating alarms & calling...")
             activate_buzzers()
             trigger_call("Warning! Poor air quality detected. Please check immediately.")
-            print("⏳ Waiting 60 seconds...")
-            time.sleep(60)
+            print(f"⏳ Waiting {ALERT_WAIT_TIME} seconds...")
+            time.sleep(ALERT_WAIT_TIME)
             deactivate_buzzers()
 
         # === Fetch Petrol Gas Data ===
-        response_gas = requests.get(GAS_URL, timeout=5)
+        response_gas = requests.get(GAS_URL, timeout=SENSOR_REQUEST_TIMEOUT)
         response_gas.raise_for_status()
         data_gas = response_gas.json()
 
@@ -106,11 +102,11 @@ while True:
             print("💥 Petrol gas detected! Activating alarms & calling...")
             activate_buzzers()
             trigger_call("Warning! Petrol gas detected. Please evacuate immediately.")
-            print("⏳ Waiting 60 seconds...")
-            time.sleep(60)
+            print(f"⏳ Waiting {ALERT_WAIT_TIME} seconds...")
+            time.sleep(ALERT_WAIT_TIME)
             deactivate_buzzers()
 
     except requests.RequestException as e:
         print(f"❌ Error fetching sensor data: {e}")
 
-    time.sleep(1)  # main loop delay
+    time.sleep(MAIN_LOOP_DELAY)  # main loop delay
