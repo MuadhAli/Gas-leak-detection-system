@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Valve Control - Sensor 2</title>
+  <script src="config.js"></script>
   <style>
     body {
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -78,9 +79,9 @@
     function controlBuzzer(action) {
       let url = "";
       if (action === "on") {
-        url = "http://192.168.1.2:5000/api/sensor2/buzzon";
+        url = CONFIG.getApiUrl(CONFIG.BUZZER2_ON_API);
       } else if (action === "off") {
-        url = "http://192.168.1.2:5000/api/sensor2/buzzoff";
+        url = CONFIG.getApiUrl(CONFIG.BUZZER2_OFF_API);
       }
 
       fetch(url)
